@@ -58,7 +58,7 @@ export default function News() {
             Top Stories
           </Typography>
           {/* TOP LEFT */}
-          {/* 
+
           {news1 &&
             news1.map((article) => {
               return (
@@ -70,7 +70,7 @@ export default function News() {
                   description={article.description}
                 />
               );
-            })} */}
+            })}
         </Box>
         {/* MINOR NEWS */}
         <Box
@@ -87,7 +87,7 @@ export default function News() {
         >
           {/* MINOR NEWS PART 1 */}
           <Box>
-            {/* {news2 &&
+            {news2 &&
               news2.map((article) => {
                 return (
                   <NewscardRight
@@ -98,11 +98,11 @@ export default function News() {
                     description={article.description}
                   />
                 );
-              })} */}
+              })}
           </Box>
           {/* MINOR NEWS PART 2 */}
           <Box>
-            {/* {news3 &&
+            {news3 &&
               news3.map((article) => {
                 return (
                   <NewscardRight
@@ -113,7 +113,7 @@ export default function News() {
                     description={article.description}
                   />
                 );
-              })} */}
+              })}
           </Box>
         </Box>
       </Box>

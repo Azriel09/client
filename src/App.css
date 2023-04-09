@@ -1,0 +1,45 @@
+.partners {
+  background: rgb(2, 0, 36);
+  background: linear-gradient(
+    90deg,
+    rgba(2, 0, 36, 1) 0%,
+    rgba(10, 20, 110, 1) 35%,
+    rgba(0, 212, 255, 1) 100%
+  );
+  height: 100%;
+  width: 100%;
+  position: absolute;
+}
+
+.about {
+  background: linear-gradient(0deg, #00000088 30%, #ffffff44 100%),
+    url("./images/about-bg.jpg");
+  height: 100%;
+  width: 100%;
+  position: absolute;
+}
+
+.news {
+  background: #e6f0fa;
+  max-height: 400%;
+  width: 100%;
+  position: absolute;
+}
+
+.login,
+.signup,
+.reset,
+.forgot {
+  background-image: url("./images/account-bg.png");
+  max-height: 100%;
+  width: 100%;
+  position: absolute;
+  background-size: cover;
+  background-repeat: no-repeat;
+  background-position: center 25%;
+  background-attachment: fixed;
+}
+
+.gg {
+  background-color: #d1cecd;
+}

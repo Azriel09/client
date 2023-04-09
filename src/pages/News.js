@@ -14,10 +14,9 @@ export default function News() {
     fetch("/api/news")
       .then((res) => res.json(res))
       .then((data) => {
-        console.log(data);
-        // setNews1(data.data1);
-        // setNews2(data.data2);
-        // setNews3(data.data3);
+        setNews1(data.data1);
+        setNews2(data.data2);
+        setNews3(data.data3);
       })
       .catch((err) => {
         console.log(err.message);

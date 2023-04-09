@@ -11,9 +11,7 @@ export default function News() {
   const [news3, setNews3] = useState([]);
 
   useEffect(() => {
-    fetch(
-      "http://ec2-52-68-78-8.ap-northeast-1.compute.amazonaws.com:8000/news"
-    )
+    fetch("/api/news")
       .then((res) => res.json(res))
       .then((data) => {
         console.log(data);

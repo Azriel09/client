@@ -17,7 +17,7 @@ import { Link, Navigate } from "react-router-dom";
 export default function Navbar() {
   const [value, setValue] = useState();
   const theme = useTheme();
-  const isMatch = useMediaQuery(theme.breakpoints.down("910"));
+  const isMatch = useMediaQuery(theme.breakpoints.down("970"));
   const pages = ["Home", "News", "Partners", "About"];
   const routes = ["/", "news", "partners", "about"];
 

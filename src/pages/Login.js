@@ -16,7 +16,10 @@ import LockOutlinedIcon from "@mui/icons-material/LockOutlined";
 import { Visibility, VisibilityOff } from "@mui/icons-material";
 import { Link as RouterLink } from "react-router-dom";
 import logo from "../images/logo.png";
+import axios from "axios";
+import Cookies from "universal-cookie";
 
+const cookies = new Cookies();
 export default function Login() {
   const theme = useTheme();
   const [email, setEmail] = useState("");
@@ -28,6 +31,35 @@ export default function Login() {
 
   const handleClickShowPassword = () => {
     setShowPassword(!showPassword);
+  };
+
+  const handleSubmit = (e) => {
+    e.preventDefault();
+
+    const configuration = {
+      method: "post",
+      url: "/api/login",
+      data: {
+        email,
+        password,
+        remember,
+      },
+    };
+
+    axios(configuration)
+      .then((result) => {
+        cookies.set("TOKEN", result.data.token, {
+          path: "/",
+        });
+
+        window.location.href = "/auth";
+
+        setLogin(true);
+      })
+      .catch((error) => {
+        error = new Error();
+        setIsFormInvalid(true);
+      });
   };
   return (
     <div>
@@ -84,7 +116,7 @@ export default function Login() {
           <Box
             component="form"
             noValidate
-            // onSubmit={(e) => handleSubmit(e)}
+            onSubmit={(e) => handleSubmit(e)}
             sx={{ mt: 1 }}
           >
             <TextField
@@ -158,7 +190,7 @@ export default function Login() {
                 type="submit"
                 fullWidth
                 variant="contained"
-                // onClick={(e) => handleSubmit(e)}
+                onClick={(e) => handleSubmit(e)}
                 sx={{
                   marginTop: 3,
                   marginBottom: 2,

@@ -60,7 +60,7 @@ export default function Graph(props) {
         size: 0,
       },
       title: {
-        text: `Exchange Rate Movement - ${props.from} to ${props.to}`,
+        text: `Exchange Rate Movement (1Y) - ${props.from} to ${props.to}`,
         align: "left",
       },
       fill: {

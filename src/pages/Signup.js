@@ -14,7 +14,7 @@ import LockOutlinedIcon from "@mui/icons-material/LockOutlined";
 import { Visibility, VisibilityOff } from "@mui/icons-material";
 import { Link as RouterLink } from "react-router-dom";
 import logo from "../images/logo.png";
-
+import axios from "axios";
 export default function Signup() {
   const theme = useTheme();
   const [name, setName] = useState("");
@@ -23,6 +23,33 @@ export default function Signup() {
   const [register, setRegister] = useState(false);
   const [isFormInvalid, setIsFormInvalid] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
+
+  const handleClickShowPassword = () => {
+    setShowPassword(!showPassword);
+  };
+  const handleSubmit = (e) => {
+    e.preventDefault();
+
+    const configuration = {
+      method: "post",
+      url: "/api/register",
+      data: {
+        name,
+        email,
+        password,
+      },
+    };
+
+    axios(configuration)
+      .then((result) => {
+        setRegister(true);
+        window.location.href = "/login";
+      })
+      .catch((error) => {
+        error = new Error();
+        setIsFormInvalid(true);
+      });
+  };
   return (
     <div>
       <Box
@@ -79,7 +106,7 @@ export default function Signup() {
           <Box
             component="form"
             validate
-            //   onSubmit={(e) => handleSubmit(e)}
+            onSubmit={(e) => handleSubmit(e)}
             sx={{
               mt: 1,
               width: "65%",
@@ -139,7 +166,7 @@ export default function Signup() {
                   <InputAdornment position="end">
                     <IconButton
                       aria-label="toggle password visibility"
-                      //   onClick={handleClickShowPassword}
+                      onClick={handleClickShowPassword}
                       edge="end"
                     >
                       {showPassword ? <Visibility /> : <VisibilityOff />}
@@ -162,7 +189,7 @@ export default function Signup() {
               type="submit"
               fullWidth
               variant="contained"
-              // onClick={(e) => handleSubmit(e)}
+              onClick={(e) => handleSubmit(e)}
               sx={{ mt: 3, mb: 2 }}
             >
               Register

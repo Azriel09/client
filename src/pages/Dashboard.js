@@ -1,8 +1,10 @@
 import React from "react";
+import { Box, Typography, useTheme } from "@mui/material";
 import Footer from "../components/footer";
-import { Box } from "@mui/material";
-import Converter from "../components/converter";
-export default function Home() {
+import Background from "../images/blue-background.png";
+import CurrencyChoose from "../components/currency-picker";
+export default function Dashboard() {
+  const theme = useTheme();
   return (
     <div>
       <Box
@@ -14,7 +16,7 @@ export default function Home() {
           alignItems: "center",
         }}
       >
-        <Converter />
+        <CurrencyChoose />
       </Box>
       <Footer />
     </div>

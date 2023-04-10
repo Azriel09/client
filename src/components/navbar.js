@@ -34,6 +34,10 @@ export default function Navbar() {
     setValue(0);
   }
 
+  function goDash() {
+    setValue(4);
+  }
+
   return (
     <React.Fragment>
       <AppBar
@@ -76,6 +80,26 @@ export default function Navbar() {
                     to={routes[index]}
                   />
                 ))}
+                {token ? (
+                  <>
+                    <Tab
+                      label="Dashboard"
+                      value={value}
+                      as={Link}
+                      to="dashboard"
+                      onClick={goDash}
+                      sx={{
+                        fontWeight: "500",
+                        fontSize: "1.4em",
+                        letterSpacing: "4px",
+                        textDecoration: "none",
+                        marginTop: "10px",
+                        color: "#00d4ff",
+                        textShadow: "2px 2px 5px white",
+                      }}
+                    />
+                  </>
+                ) : null}
               </Tabs>
               {token ? (
                 <Button

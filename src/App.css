@@ -26,7 +26,6 @@
   position: absolute;
 }
 
-
 .login,
 .signup,
 .reset,
@@ -39,8 +38,4 @@
   background-repeat: no-repeat;
   background-position: center 25%;
   background-attachment: fixed;
-}
-
-.gg {
-  background-color: #d1cecd;
 }

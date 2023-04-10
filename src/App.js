@@ -7,6 +7,8 @@ import Forgot from "./pages/Forgot";
 import Login from "./pages/Login";
 import Signup from "./pages/Signup";
 import Reset from "./pages/Reset";
+import ProtectedRoutes from "./ProtectedRoute";
+import Auth from "./Auth";
 import Withnav from "./components/Withnav";
 import Withoutnav from "./components/withoutnav";
 import { Routes, Route, useLocation } from "react-router-dom";
@@ -25,15 +27,14 @@ function App() {
           <Route path="/reset" element={<Reset />} />
           <Route path="/forgot" element={<Forgot />} />
 
-          {/*<Route
+          <Route
             path="/auth"
             element={
               <ProtectedRoutes>
-                <AuthComponent />
+                <Auth />
               </ProtectedRoutes>
             }
           />
-          <Route path="/free" component={FreeComponent} /> */}
         </Route>
         <Route element={<Withnav />}>
           <Route path="/" element={<Home />} />

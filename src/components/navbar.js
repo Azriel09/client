@@ -1,11 +1,9 @@
 import React, { useState } from "react";
 import logo from "../images/logo.png";
 import DrawerComp from "./drawer";
-import Box from "@mui/material/Box";
-
 import {
   AppBar,
-  Typography,
+  Box,
   Tab,
   Tabs,
   Toolbar,
@@ -14,12 +12,27 @@ import {
   useTheme,
 } from "@mui/material";
 import { Link, Navigate } from "react-router-dom";
+import Cookies from "universal-cookie";
+
 export default function Navbar() {
+  const cookies = new Cookies();
+  const token = cookies.get("TOKEN");
   const [value, setValue] = useState();
   const theme = useTheme();
   const isMatch = useMediaQuery(theme.breakpoints.down("970"));
   const pages = ["Home", "News", "Partners", "About"];
   const routes = ["/", "news", "partners", "about"];
+
+  const logout = () => {
+    // destroy the cookie
+    cookies.remove("TOKEN", { path: "/" });
+    // redirect user to the landing page
+    window.location.href = "/";
+  };
+
+  function goHome() {
+    setValue(0);
+  }
 
   return (
     <React.Fragment>
@@ -31,8 +44,9 @@ export default function Navbar() {
       >
         <Toolbar>
           <Button as={Link} to={"/"}>
-            <img src={logo} alt="" width={110} height={35} />
+            <img src={logo} alt="" width={110} height={35} onClick={goHome} />
           </Button>
+
           {isMatch ? (
             <>
               <DrawerComp />
@@ -63,30 +77,47 @@ export default function Navbar() {
                   />
                 ))}
               </Tabs>
-              <Button
-                sx={{
-                  marginLeft: "auto",
-                  textDecoration: "none",
-                  textAlign: "center",
-                }}
-                variant="contained"
-                as={Link}
-                to="login"
-              >
-                Login
-              </Button>
-              <Button
-                sx={{
-                  marginLeft: "10px",
-                  textDecoration: "none",
-                  textAlign: "center",
-                }}
-                variant="contained"
-                as={Link}
-                to="signup"
-              >
-                Signup
-              </Button>
+              {token ? (
+                <Button
+                  sx={{
+                    marginLeft: "auto",
+                    textDecoration: "none",
+                    textAlign: "center",
+                  }}
+                  onClick={() => logout()}
+                  variant="contained"
+                >
+                  Logout
+                </Button>
+              ) : (
+                <>
+                  {" "}
+                  <Button
+                    sx={{
+                      marginLeft: "auto",
+                      textDecoration: "none",
+                      textAlign: "center",
+                    }}
+                    variant="contained"
+                    as={Link}
+                    to="login"
+                  >
+                    Login
+                  </Button>
+                  <Button
+                    sx={{
+                      marginLeft: "10px",
+                      textDecoration: "none",
+                      textAlign: "center",
+                    }}
+                    variant="contained"
+                    as={Link}
+                    to="signup"
+                  >
+                    Signup
+                  </Button>
+                </>
+              )}
             </>
           )}
         </Toolbar>

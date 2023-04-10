@@ -15,16 +15,21 @@ import {
 import axios from "axios";
 import Loading from "./loading";
 import Graph from "./chart";
+import Calendar from "./calendar";
+import moment from "moment";
+
 export default function Converter() {
+  const currentYear = moment().add(1, "second").format("YYYY-MM-DD");
   const theme = useTheme();
   const isMatch = useMediaQuery(theme.breakpoints.down("550"));
   const [code, setCode] = useState("");
   const [selected, setSelected] = useState("");
   const [selected2, setSelected2] = useState("");
-  const [amount, setAmount] = useState("");
+  const [amount, setAmount] = useState("1");
   const [converted, setConverted] = useState("");
-
+  const [datepick, setDatePick] = useState(`${currentYear}`);
   const [ongoing, setOngoing] = useState();
+  const [error, setError] = useState(false);
 
   useEffect(() => {
     fetch("https://api.exchangerate.host/symbols")
@@ -39,20 +44,35 @@ export default function Converter() {
 
   const handleSubmit = (e) => {
     setOngoing(true);
+    if (!selected || !selected2) {
+      setError(true);
+      setOngoing(false);
+      return;
+    }
+
+    // `https://api.exchangerate.host/convert?amount=${amount}&from=${selected}&to=${selected2}&date=${datepick}`
     const configuration = {
       method: "get",
-      url: `https://api.exchangerate.host/convert?amount=${amount}&from=${selected}&to=${selected2}`,
+      url: `https://api.exchangerate.host/${datepick}?base=${selected}&symbols=${selected2}&amount=${amount}`,
     };
 
     axios(configuration)
       .then((result) => {
-        setConverted(result.data.result);
+        setConverted(result.data.rates);
+        for (const [key, value] of Object.entries(result.data.rates)) {
+          setConverted(value);
+        }
         setOngoing(false);
+        setError(false);
       })
       .catch((error) => {
         error = new Error();
         console.log(error);
       });
+  };
+
+  const getDate = (date) => {
+    setDatePick(date);
   };
 
   return (
@@ -243,6 +263,7 @@ export default function Converter() {
               </>
             ) : (
               <TextField
+                error={error}
                 label="Converted Amount"
                 defaultValue={`${converted} ${selected2}`}
                 InputProps={{
@@ -271,7 +292,9 @@ export default function Converter() {
       </Box>
       {/* GRAPH */}
       {/* Chart wont show up in mobile unless browsing in landscape mode*/}
-      {isMatch ? null : (
+      {isMatch ? (
+        <Calendar getDate={getDate} />
+      ) : (
         <Box sx={{ marginTop: "20px", padding: "30px" }}>
           <Graph from={selected} to={selected2} />
         </Box>

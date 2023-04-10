@@ -11,7 +11,8 @@ export default function News() {
   const [news3, setNews3] = useState([]);
 
   useEffect(() => {
-    fetch("/api/news")
+    // fetch("/api/news")
+    fetch("http://localhost:8000/news")
       .then((res) => res.json(res))
       .then((data) => {
         setNews1(data.data1);

@@ -10,6 +10,7 @@ import Reset from "./pages/Reset";
 import ProtectedRoutes from "./ProtectedRoute";
 import Auth from "./Auth";
 import Withnav from "./components/Withnav";
+import Dashboard from "./pages/Dashboard";
 import Withoutnav from "./components/withoutnav";
 import { Routes, Route, useLocation } from "react-router-dom";
 
@@ -41,6 +42,14 @@ function App() {
           <Route path="/news" element={<News />} />
           <Route path="/about" element={<About />} />
           <Route path="/partners" element={<Partners />} />
+          <Route
+            path="/dashboard"
+            element={
+              <ProtectedRoutes>
+                <Dashboard />
+              </ProtectedRoutes>
+            }
+          />
         </Route>
       </Routes>
     </div>

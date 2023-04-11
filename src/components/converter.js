@@ -7,7 +7,6 @@ import {
   useTheme,
   InputLabel,
   MenuItem,
-  FormHelperText,
   Button,
   TextField,
   useMediaQuery,
@@ -58,7 +57,6 @@ export default function Converter() {
 
     axios(configuration)
       .then((result) => {
-        setConverted(result.data.rates);
         for (const [key, value] of Object.entries(result.data.rates)) {
           setConverted(value);
         }

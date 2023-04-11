@@ -19,7 +19,7 @@ export default function Navbar() {
   const token = cookies.get("TOKEN");
   const [value, setValue] = useState();
   const theme = useTheme();
-  const isMatch = useMediaQuery(theme.breakpoints.down("970"));
+  const isMatch = useMediaQuery(theme.breakpoints.down("1070"));
   const pages = ["Home", "News", "Partners", "About"];
   const routes = ["/", "news", "partners", "about"];
 

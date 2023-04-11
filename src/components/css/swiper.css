@@ -1,0 +1,9 @@
+.swiper-slide {
+  font-size: 18px;
+  background-color: #1c1ca0;
+  border-radius: 10px;
+  min-height: 150px;
+  max-height: 150px;
+  min-width: 256px;
+  max-width: 300px;
+}

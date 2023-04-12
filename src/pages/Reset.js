@@ -3,7 +3,6 @@ import {
   Box,
   Typography,
   Button,
-  FormControlLabel,
   TextField,
   useTheme,
   Avatar,
@@ -15,7 +14,7 @@ import LockOutlinedIcon from "@mui/icons-material/LockOutlined";
 import logo from "../images/logo.png";
 import { Link as RouterLink } from "react-router-dom";
 import { Visibility, VisibilityOff } from "@mui/icons-material";
-
+import axios from "axios";
 export default function Reset() {
   const theme = useTheme();
   let search = window.location.search;
@@ -26,6 +25,26 @@ export default function Reset() {
   const token = new URLSearchParams(search).get("token");
   const handleClickShowPassword = () => {
     setShowPassword(!showPassword);
+  };
+
+  const handleSubmit = (e) => {
+    e.preventDefault();
+
+    const configuration = {
+      method: "post",
+      url: "http://localhost:8000/reset",
+      data: {
+        token,
+        password,
+      },
+    };
+
+    axios(configuration)
+      .then((result) => {})
+      .catch((error) => {
+        error = new Error();
+        console.log(error);
+      });
   };
   return (
     <div>
@@ -82,7 +101,7 @@ export default function Reset() {
           <Box
             component="form"
             noValidate
-            // onSubmit={(e) => handleSubmit(e)}
+            onSubmit={(e) => handleSubmit(e)}
             sx={{ mt: 1 }}
           >
             <TextField
@@ -120,7 +139,7 @@ export default function Reset() {
               type="submit"
               fullWidth
               variant="contained"
-              //   onClick={(e) => handleSubmit(e)}
+              onClick={(e) => handleSubmit(e)}
               sx={{ mt: 3, mb: 2 }}
             >
               Reset Password

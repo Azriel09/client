@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
   Box,
   Typography,
@@ -11,6 +11,7 @@ import {
   DialogContentText,
   DialogTitle,
 } from "@mui/material";
+import DeleteIcon from "@mui/icons-material/Delete";
 import moment from "moment";
 import { Swiper, SwiperSlide } from "swiper/react";
 import { Pagination, Navigation } from "swiper";
@@ -22,22 +23,78 @@ import AddCircleOutlineIcon from "@mui/icons-material/AddCircleOutline";
 import DashboardOptions from "./dashboard-options";
 import axios from "axios";
 import Loading from "./loading";
+import Cookies from "universal-cookie";
+
+function useForceUpdate() {
+  let [value, setState] = useState(true);
+  return () => setState(!value);
+}
+
+const cookies = new Cookies();
 export default function CurrencyChoose() {
+  const token = cookies.get("TOKEN");
   const theme = useTheme();
   const pages = [];
+  const rates = [];
   const [selected, setSelected] = useState([]);
   const [openDialog, setOpenDialog] = React.useState(false);
-  const [render, setRender] = useState(true);
+  const [render, setRender] = useState(false);
   const [swipePages, setSwipePages] = useState(pages);
   const [noSelected, setNoSelected] = useState(false);
   const [loading, setLoading] = useState(false);
-  const [rate, setRate] = useState();
+  const [rate, setRate] = useState(rates);
+
+  useEffect(() => {
+    const configuration = {
+      method: "get",
+      url: "http://localhost:8000/dashboard",
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    };
+    axios(configuration)
+      .then((result) => {
+        setSwipePages(result.data);
+        console.log(result.data);
+        result.data.map((r) => getRate(r[0]));
+        setRender(true);
+      })
+      .catch((error) => {
+        error = new Error();
+      });
+  }, []);
 
   const yesterDate = moment().subtract(1, "day").format("YYYY-MM-DD");
   const dateBeforeYesterdate = moment().subtract(2, "day").format("YYYY-MM-DD");
-  console.log(yesterDate, dateBeforeYesterdate);
+  const handleForceupdateMethod = useForceUpdate();
+
   const handleClickOpen = () => {
     setOpenDialog(true);
+  };
+  const getRate = (s1) => {
+    const first = s1.split(",")[0];
+    const second = s1.split(",")[1];
+
+    const link = `https://api.exchangerate.host/fluctuation?start_date=${yesterDate}&end_date=${dateBeforeYesterdate}&base=${first}&symbols=${second}`;
+
+    const configuration = {
+      method: "get",
+      url: link,
+    };
+
+    axios(configuration)
+      .then((result) => {
+        for (const [key, value] of Object.entries(result.data.rates)) {
+          const newRate = value.change_pct;
+          rates.push(newRate);
+          const newRateList = [...rate, newRate];
+          setRate(newRateList);
+        }
+      })
+      .catch((error) => {
+        error = new Error();
+        console.log(error);
+      });
   };
 
   const getSelected = (selectedOptions) => {
@@ -48,21 +105,42 @@ export default function CurrencyChoose() {
     setOpenDialog(false);
   };
 
+  const saveToProfile = (newList) => {
+    const configuration = {
+      method: "get",
+      url: "http://localhost:8000/auth-endpoint",
+      headers: {
+        Authorization: `Bearer ${token}`,
+        currency: newList,
+      },
+    };
+    axios(configuration)
+      .then((result) => {})
+      .catch((error) => {
+        error = new Error();
+        console.log(error);
+      });
+  };
   const addCurrency = () => {
     setLoading(true);
+    const link = `https://api.exchangerate.host/fluctuation?start_date=${yesterDate}&end_date=${dateBeforeYesterdate}&base=${selected[0]}&symbols=${selected[1]}`;
+    console.log(link);
     if (selected.length === 0) {
       setNoSelected(true);
       return;
     }
     const configuration = {
       method: "get",
-      url: `https://api.exchangerate.host/fluctuation?start_date=${dateBeforeYesterdate}&end_date=${yesterDate}&base=${selected[0]}&symbols=${selected[1]}`,
+      url: link,
     };
 
     axios(configuration)
       .then((result) => {
         for (const [key, value] of Object.entries(result.data.rates)) {
-          setRate(value.change_pct);
+          const newRate = value.change_pct;
+
+          const newRateList = [...rate, newRate];
+          setRate(newRateList);
         }
       })
       .catch((error) => {
@@ -75,6 +153,89 @@ export default function CurrencyChoose() {
     setSelected([]);
     handleClose();
     setLoading(false);
+    saveToProfile([selected[0], selected[1]]);
+    setTimeout(() => {
+      handleForceupdateMethod();
+    }, 500);
+  };
+
+  const deleteCurrency = (e) => {
+    setRender(false);
+    const index = e.currentTarget.value;
+
+    const tempoList = swipePages;
+    const spliceList = swipePages.splice(index, 1);
+    const newList = [...tempoList];
+    setSwipePages(newList);
+
+    const tempoRate = rate;
+    const spliceRate = rate.splice(index, 1);
+    const newRate = [...tempoRate];
+    setRate(newRate);
+    setRender(true);
+
+    const configuration = {
+      method: "get",
+      url: "http://localhost:8000/delete",
+      headers: {
+        Authorization: `Bearer ${token}`,
+        currency: newList,
+      },
+    };
+    axios(configuration)
+      .then((result) => {
+        console.log(result);
+      })
+      .catch((error) => {
+        error = new Error();
+        console.log(error);
+      });
+  };
+
+  const checkPositive = (p, index) => {
+    if (rate[index] >= 0) {
+      return (
+        <SwiperSlide className="swiper-slide" key={index}>
+          <Box
+            sx={{
+              display: "flex",
+              flexDirection: "column",
+              alignItems: "center",
+              justifyContent: "center",
+              color: "lightgreen",
+              gap: "30px",
+            }}
+          >
+            <Typography>{p}</Typography>
+            <Typography>{rate[index]}%</Typography>
+            <Button value={index} onClick={(e) => deleteCurrency(e)}>
+              <DeleteIcon sx={{ color: "white" }} />
+            </Button>
+          </Box>
+        </SwiperSlide>
+      );
+    } else {
+      return (
+        <SwiperSlide className="swiper-slide">
+          <Box
+            sx={{
+              display: "flex",
+              flexDirection: "column",
+              alignItems: "center",
+              justifyContent: "center",
+              color: "red",
+              gap: "30px",
+            }}
+          >
+            <Typography>{p}</Typography>
+            <Typography>{rate[index]}%</Typography>
+            <Button value={index} onClick={(e) => deleteCurrency(e)}>
+              <DeleteIcon sx={{ color: "white" }} />
+            </Button>
+          </Box>
+        </SwiperSlide>
+      );
+    }
   };
 
   return (
@@ -162,22 +323,7 @@ export default function CurrencyChoose() {
                 {loading ? (
                   <Loading />
                 ) : (
-                  swipePages.map((p) => (
-                    <SwiperSlide className="swiper-slide">
-                      <Box
-                        sx={{
-                          display: "flex",
-                          flexDirection: "column",
-                          alignItems: "center",
-                          justifyContent: "center",
-                          color: "lightblue",
-                          gap: "30px",
-                        }}
-                      >
-                        <div>{p}</div> <div>{rate}</div>
-                      </Box>
-                    </SwiperSlide>
-                  ))
+                  swipePages.map((p, index) => checkPositive(p, index))
                 )}
               </Swiper>
             </Box>
@@ -235,6 +381,8 @@ export default function CurrencyChoose() {
           sx={{ width: "100%", height: "500px", backgroundColor: "gray" }}
         ></Box>
       </Box>
+
+      {/* ADD CURRENCY POP UP */}
       <Dialog open={openDialog} onClose={handleClose}>
         <DialogTitle>Choose a currency to save</DialogTitle>
         <DialogContent>

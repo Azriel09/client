@@ -14,10 +14,29 @@ import {
 import LockOutlinedIcon from "@mui/icons-material/LockOutlined";
 import logo from "../images/logo.png";
 import { Link as RouterLink } from "react-router-dom";
+import axios from "axios";
 
 export default function Forgot() {
   const theme = useTheme();
   const [email, setEmail] = useState("");
+  const handleSubmit = (e) => {
+    e.preventDefault();
+
+    const configuration = {
+      method: "post",
+      url: "http://localhost:8000/forgot",
+      data: {
+        email,
+      },
+    };
+
+    axios(configuration)
+      .then((result) => {})
+      .catch((error) => {
+        error = new Error();
+      });
+  };
+
   return (
     <div>
       <Box
@@ -73,7 +92,7 @@ export default function Forgot() {
           <Box
             component="form"
             noValidate
-            // onSubmit={(e) => handleSubmit(e)}
+            onSubmit={(e) => handleSubmit(e)}
             sx={{ mt: 1 }}
           >
             <TextField
@@ -97,7 +116,7 @@ export default function Forgot() {
               type="submit"
               fullWidth
               variant="contained"
-              //   onClick={(e) => handleSubmit(e)}
+              onClick={(e) => handleSubmit(e)}
               sx={{ mt: 3, mb: 2 }}
             >
               Send Reset Code

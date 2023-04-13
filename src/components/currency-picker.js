@@ -49,7 +49,7 @@ export default function CurrencyChoose() {
   useEffect(() => {
     const configuration = {
       method: "get",
-      url: "http://localhost:8000/dashboard",
+      url: "/api/dashboard",
       headers: {
         Authorization: `Bearer ${token}`,
       },

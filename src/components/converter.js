@@ -49,7 +49,7 @@ export default function Converter() {
       return;
     }
 
-    // `https://api.exchangerate.host/convert?amount=${amount}&from=${selected}&to=${selected2}&date=${datepick}`
+  
     const configuration = {
       method: "get",
       url: `https://api.exchangerate.host/${datepick}?base=${selected}&symbols=${selected2}&amount=${amount}`,

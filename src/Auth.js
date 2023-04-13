@@ -8,8 +8,6 @@ export default function Auth() {
   const cookies = new Cookies();
   const token = cookies.get("TOKEN");
 
-  const [rates, setRates] = useState([]);
-
   useEffect(() => {
     const configuration = {
       method: "get",
@@ -19,10 +17,7 @@ export default function Auth() {
       },
     };
     axios(configuration)
-      .then((result) => {
-        setRates(result.data.rates);
-        console.log(result.data.rates);
-      })
+      .then((result) => {})
       .catch((error) => {
         error = new Error();
       });
@@ -39,8 +34,7 @@ export default function Auth() {
     <div className="text-center">
       <h1>Login Successful!</h1>
 
-      {/* logout */}
-      {<Navigate to="/" />}
+      {<Navigate to="/dashboard" />}
     </div>
   );
 }

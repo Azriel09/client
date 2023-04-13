@@ -4,14 +4,14 @@ import {
   Typography,
   useTheme,
   Button,
-  TextField,
   Dialog,
   DialogActions,
   DialogContent,
   DialogContentText,
   DialogTitle,
 } from "@mui/material";
-import DeleteIcon from "@mui/icons-material/Delete";
+
+import CloseIcon from "@mui/icons-material/Close";
 import moment from "moment";
 import { Swiper, SwiperSlide } from "swiper/react";
 import { Pagination, Navigation } from "swiper";
@@ -20,15 +20,13 @@ import "swiper/css";
 import "swiper/css/pagination";
 import "swiper/css/navigation";
 import AddCircleOutlineIcon from "@mui/icons-material/AddCircleOutline";
+import ArrowUpwardIcon from "@mui/icons-material/ArrowUpward";
+import ArrowDownwardIcon from "@mui/icons-material/ArrowDownward";
 import DashboardOptions from "./dashboard-options";
 import axios from "axios";
 import Loading from "./loading";
 import Cookies from "universal-cookie";
-
-function useForceUpdate() {
-  let [value, setState] = useState(true);
-  return () => setState(!value);
-}
+import DashboardGraph from "./dashboard-graph";
 
 const cookies = new Cookies();
 export default function CurrencyChoose() {
@@ -43,6 +41,10 @@ export default function CurrencyChoose() {
   const [noSelected, setNoSelected] = useState(false);
   const [loading, setLoading] = useState(false);
   const [rate, setRate] = useState(rates);
+  const [newRate, setNewRate] = useState([]);
+
+  const [showChart, setShowChart] = useState(false);
+  const [toPass, setToPass] = useState();
 
   useEffect(() => {
     const configuration = {
@@ -56,24 +58,27 @@ export default function CurrencyChoose() {
       .then((result) => {
         setSwipePages(result.data);
         console.log(result.data);
-        result.data.map((r) => getRate(r[0]));
-        setRender(true);
+        if (result.data.length >= 1) {
+          result.data.map((r) => getRate(r));
+          setRender(true);
+        } else {
+          return;
+        }
       })
       .catch((error) => {
         error = new Error();
       });
-  }, []);
+  }, [loading]);
 
   const yesterDate = moment().subtract(1, "day").format("YYYY-MM-DD");
   const dateBeforeYesterdate = moment().subtract(2, "day").format("YYYY-MM-DD");
-  const handleForceupdateMethod = useForceUpdate();
 
   const handleClickOpen = () => {
     setOpenDialog(true);
   };
   const getRate = (s1) => {
-    const first = s1.split(",")[0];
-    const second = s1.split(",")[1];
+    const first = s1[0];
+    const second = s1[1];
 
     const link = `https://api.exchangerate.host/fluctuation?start_date=${yesterDate}&end_date=${dateBeforeYesterdate}&base=${first}&symbols=${second}`;
 
@@ -88,7 +93,7 @@ export default function CurrencyChoose() {
           const newRate = value.change_pct;
           rates.push(newRate);
           const newRateList = [...rate, newRate];
-          setRate(newRateList);
+          setNewRate(newRateList);
         }
       })
       .catch((error) => {
@@ -106,12 +111,13 @@ export default function CurrencyChoose() {
   };
 
   const saveToProfile = (newList) => {
+    console.log(newList);
     const configuration = {
       method: "get",
-      url: "http://localhost:8000/auth-endpoint",
+      url: "/api/auth-endpoint",
       headers: {
         Authorization: `Bearer ${token}`,
-        currency: newList,
+        currency: [newList],
       },
     };
     axios(configuration)
@@ -121,43 +127,32 @@ export default function CurrencyChoose() {
         console.log(error);
       });
   };
-  const addCurrency = () => {
+
+  async function fetchData() {
     setLoading(true);
     const link = `https://api.exchangerate.host/fluctuation?start_date=${yesterDate}&end_date=${dateBeforeYesterdate}&base=${selected[0]}&symbols=${selected[1]}`;
-    console.log(link);
-    if (selected.length === 0) {
-      setNoSelected(true);
-      return;
+    console.log(selected[0], selected[1]);
+    try {
+      const response = await fetch(link);
+      const result = await response.json();
+      console.log(result);
+      for (const [key, value] of Object.entries(result.rates)) {
+        const newRate = value.change_pct;
+        const newRateList = [...rate, newRate];
+        setRate(newRateList);
+        console.log(newRate);
+        const newCodes = [...swipePages, [selected[0], selected[1]]];
+        setSwipePages(newCodes);
+        setLoading(false);
+      }
+    } catch (error) {
+      console.error(error);
     }
-    const configuration = {
-      method: "get",
-      url: link,
-    };
-
-    axios(configuration)
-      .then((result) => {
-        for (const [key, value] of Object.entries(result.data.rates)) {
-          const newRate = value.change_pct;
-
-          const newRateList = [...rate, newRate];
-          setRate(newRateList);
-        }
-      })
-      .catch((error) => {
-        error = new Error();
-        console.log(error);
-      });
-    const last = swipePages.slice(-1)[0];
-    const newList = [...swipePages, [selected[0], selected[1]]];
-    setSwipePages(newList);
     setSelected([]);
     handleClose();
-    setLoading(false);
+
     saveToProfile([selected[0], selected[1]]);
-    setTimeout(() => {
-      handleForceupdateMethod();
-    }, 500);
-  };
+  }
 
   const deleteCurrency = (e) => {
     setRender(false);
@@ -165,7 +160,9 @@ export default function CurrencyChoose() {
 
     const tempoList = swipePages;
     const spliceList = swipePages.splice(index, 1);
+
     const newList = [...tempoList];
+    console.log(newList);
     setSwipePages(newList);
 
     const tempoRate = rate;
@@ -176,7 +173,7 @@ export default function CurrencyChoose() {
 
     const configuration = {
       method: "get",
-      url: "http://localhost:8000/delete",
+      url: "/api/delete",
       headers: {
         Authorization: `Bearer ${token}`,
         currency: newList,
@@ -193,49 +190,136 @@ export default function CurrencyChoose() {
   };
 
   const checkPositive = (p, index) => {
+    // const tempoRate = rate;
+    // const first = tempoRate.splice(-1);
+    // const second = tempoRate.splice(-2);
+    // console.log(first, second);
+
     if (rate[index] >= 0) {
       return (
-        <SwiperSlide className="swiper-slide" key={index}>
-          <Box
-            sx={{
-              display: "flex",
-              flexDirection: "column",
-              alignItems: "center",
-              justifyContent: "center",
-              color: "lightgreen",
-              gap: "30px",
-            }}
-          >
-            <Typography>{p}</Typography>
-            <Typography>{rate[index]}%</Typography>
-            <Button value={index} onClick={(e) => deleteCurrency(e)}>
-              <DeleteIcon sx={{ color: "white" }} />
+        <div>
+          <SwiperSlide className="swiper-slide" key={index} value="gg">
+            <Button
+              value={[p[0], p[1]]}
+              sx={{ width: "100%", height: "100%" }}
+              onClick={(e) => setChart([e.currentTarget.value])}
+            >
+              <Box
+                sx={{
+                  display: "flex",
+                  flexDirection: "column",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  color: "lightgreen",
+                  gap: "10px",
+                }}
+              >
+                <Typography sx={{ fontSize: "1.5em", color: "white" }}>
+                  {p[0]}/{p[1]}
+                </Typography>
+                <Box
+                  sx={{
+                    display: "flex",
+                    flexDirection: "row",
+                    alignItems: "center",
+                    justifyContent: "center",
+                  }}
+                >
+                  <Typography sx={{ fontSize: "2em" }}>
+                    {rate[index]}%
+                  </Typography>
+                  <ArrowUpwardIcon />
+                </Box>
+              </Box>
             </Button>
-          </Box>
-        </SwiperSlide>
+            <Box
+              sx={{
+                display: "flex",
+                flexDirection: "column",
+                justifyContent: "center",
+                alignItems: "center",
+              }}
+            >
+              <Button
+                sx={{ marginLeft: "auto", marginRight: "auto" }}
+                className="button-doko"
+                value={index}
+                onClick={(e) => deleteCurrency(e)}
+              >
+                <CloseIcon
+                  sx={{ color: "white", width: "35px", height: "35px" }}
+                />
+              </Button>
+            </Box>
+          </SwiperSlide>
+        </div>
       );
     } else {
       return (
-        <SwiperSlide className="swiper-slide">
-          <Box
-            sx={{
-              display: "flex",
-              flexDirection: "column",
-              alignItems: "center",
-              justifyContent: "center",
-              color: "red",
-              gap: "30px",
-            }}
-          >
-            <Typography>{p}</Typography>
-            <Typography>{rate[index]}%</Typography>
-            <Button value={index} onClick={(e) => deleteCurrency(e)}>
-              <DeleteIcon sx={{ color: "white" }} />
+        <div>
+          <SwiperSlide className="swiper-slide" key={index} value="GG1">
+            <Button
+              value={[p[0], p[1]]}
+              sx={{ width: "100%", height: "100%" }}
+              onClick={(e) => setChart([e.currentTarget.value])}
+            >
+              <Box
+                sx={{
+                  display: "flex",
+                  flexDirection: "column",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  color: "red",
+                  gap: "10px",
+                }}
+              >
+                <Typography sx={{ fontSize: "1.5em", color: "white" }}>
+                  {" "}
+                  {p[0]}/{p[1]}
+                </Typography>
+                <Box
+                  sx={{
+                    display: "flex",
+                    flexDirection: "row",
+                    alignItems: "center",
+                    justifyContent: "center",
+                  }}
+                >
+                  <Typography sx={{ fontSize: "2em" }}>
+                    {rate[index]}%
+                  </Typography>
+                  <ArrowDownwardIcon />
+                </Box>
+              </Box>
             </Button>
-          </Box>
-        </SwiperSlide>
+            <Box
+              sx={{
+                display: "flex",
+                flexDirection: "column",
+                justifyContent: "center",
+                alignItems: "center",
+              }}
+            >
+              <Button
+                className="button-doko"
+                value={index}
+                onClick={(e) => deleteCurrency(e)}
+              >
+                <CloseIcon
+                  sx={{ color: "white", width: "35px", height: "35px" }}
+                />
+              </Button>
+            </Box>
+          </SwiperSlide>
+        </div>
       );
     }
+  };
+
+  const setChart = (value) => {
+    setTimeout(setShowChart(false), 500);
+    setShowChart(true);
+    setToPass(value);
   };
 
   return (
@@ -244,7 +328,6 @@ export default function CurrencyChoose() {
         sx={{
           maxHeight: "200vh",
           width: "100%",
-          marginBottom: "5vh",
         }}
       >
         {/* CURRENCIES */}
@@ -320,10 +403,8 @@ export default function CurrencyChoose() {
                   },
                 }}
               >
-                {loading ? (
-                  <Loading />
-                ) : (
-                  swipePages.map((p, index) => checkPositive(p, index))
+                {loading ? null : (
+                  <>{swipePages.map((p, index) => checkPositive(p, index))}</>
                 )}
               </Swiper>
             </Box>
@@ -377,26 +458,35 @@ export default function CurrencyChoose() {
             </Box>
           </Box>
         </Box>
-        <Box
-          sx={{ width: "100%", height: "500px", backgroundColor: "gray" }}
-        ></Box>
+        {showChart ? <DashboardGraph pass={toPass} /> : null}
       </Box>
 
       {/* ADD CURRENCY POP UP */}
-      <Dialog open={openDialog} onClose={handleClose}>
-        <DialogTitle>Choose a currency to save</DialogTitle>
-        <DialogContent>
-          <DialogContentText>
-            Choose a currency to instantly view it the moment you open this
-            website
-          </DialogContentText>
-          <DashboardOptions getSelected={getSelected} noSelected={noSelected} />
-        </DialogContent>
-        <DialogActions>
-          <Button onClick={handleClose}>Cancel</Button>
-          <Button onClick={() => addCurrency()}>Confirm</Button>
-        </DialogActions>
-      </Dialog>
+      {loading ? (
+        <Dialog open={openDialog} onClose={handleClose}>
+          <DialogContent sx={{ backgroundColor: "rgba(255,255,255,0.1)" }}>
+            <Loading />
+          </DialogContent>
+        </Dialog>
+      ) : (
+        <Dialog open={openDialog} onClose={handleClose}>
+          <DialogTitle>Choose a currency to save</DialogTitle>
+          <DialogContent>
+            <DialogContentText>
+              Choose a currency to instantly view it the moment you open this
+              website
+            </DialogContentText>
+            <DashboardOptions
+              getSelected={getSelected}
+              noSelected={noSelected}
+            />
+          </DialogContent>
+          <DialogActions>
+            <Button onClick={handleClose}>Cancel</Button>
+            <Button onClick={(e) => fetchData(e)}>Confirm</Button>
+          </DialogActions>
+        </Dialog>
+      )}
     </>
   );
 }

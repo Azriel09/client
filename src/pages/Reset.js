@@ -32,7 +32,7 @@ export default function Reset() {
 
     const configuration = {
       method: "post",
-      url: "http://localhost:8000/reset",
+      url: "/api/reset",
       data: {
         token,
         password,

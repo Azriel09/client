@@ -17,7 +17,7 @@ import { Routes, Route, useLocation } from "react-router-dom";
 function App() {
   const path = useLocation().pathname;
   const location = path.split("/")[1];
-  console.log(location);
+ 
   return (
     <div className={location}>
       <Routes>

@@ -12,7 +12,7 @@ export default function News() {
 
   useEffect(() => {
     // fetch("/api/news")
-    fetch("http://localhost:8000/news")
+    fetch("/api/news")
       .then((res) => res.json(res))
       .then((data) => {
         setNews1(data.data1);

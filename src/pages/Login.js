@@ -39,7 +39,7 @@ export default function Login() {
     const configuration = {
       method: "post",
       // url: "/api/login",
-      url: "http://localhost:8000/login",
+      url: "/api/login",
       data: {
         email,
         password,

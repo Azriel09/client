@@ -25,6 +25,7 @@ export default function Graph(props) {
           }
         }
         setDates(date);
+        console.log(date);
       })
       .catch((err) => {
         console.log(err.message);

@@ -12,6 +12,7 @@ import {
 } from "@mui/material";
 
 export default function DashboardOptions({ getSelected }) {
+  const theme = useTheme();
   const [code, setCode] = useState("");
   const [error, setError] = useState(false);
   const [selected, setSelected] = useState("");
@@ -42,6 +43,9 @@ export default function DashboardOptions({ getSelected }) {
         justifyContent: "center",
         alignItems: "center",
         gap: "10px",
+        [theme.breakpoints.down("520")]: {
+          flexDirection: "column",
+        },
       }}
     >
       <Box
@@ -51,6 +55,9 @@ export default function DashboardOptions({ getSelected }) {
           justifyContent: "center",
           alignItems: "center",
           width: "50%",
+          [theme.breakpoints.down("520")]: {
+            width: "90%",
+          },
         }}
       >
         <Typography>Base Currency</Typography>
@@ -88,6 +95,9 @@ export default function DashboardOptions({ getSelected }) {
           justifyContent: "center",
           alignItems: "center",
           width: "50%",
+          [theme.breakpoints.down("520")]: {
+            width: "90%",
+          },
         }}
       >
         <Typography>Converted Currency</Typography>

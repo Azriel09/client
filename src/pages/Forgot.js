@@ -24,7 +24,7 @@ export default function Forgot() {
 
     const configuration = {
       method: "post",
-      url: "http://localhost:8000/forgot",
+      url: "/api/forgot",
       data: {
         email,
       },

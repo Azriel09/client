@@ -4,17 +4,11 @@ import {
   Typography,
   useTheme,
   Button,
-  TextField,
   Dialog,
   DialogActions,
   DialogContent,
   DialogContentText,
   DialogTitle,
-  Radio,
-  RadioGroup,
-  FormControlLabel,
-  FormControl,
-  FormLabel,
 } from "@mui/material";
 
 import CloseIcon from "@mui/icons-material/Close";
@@ -48,7 +42,7 @@ export default function CurrencyChoose() {
   const [loading, setLoading] = useState(false);
   const [rate, setRate] = useState(rates);
   const [newRate, setNewRate] = useState([]);
-  const [hasData, setHasData] = useState(false);
+
   const [showChart, setShowChart] = useState(false);
   const [toPass, setToPass] = useState();
 
@@ -65,7 +59,6 @@ export default function CurrencyChoose() {
         setSwipePages(result.data);
         console.log(result.data);
         if (result.data.length >= 1) {
-          setHasData(true);
           result.data.map((r) => getRate(r));
           setRender(true);
         } else {
@@ -121,7 +114,7 @@ export default function CurrencyChoose() {
     console.log(newList);
     const configuration = {
       method: "get",
-      url: "http://localhost:8000/auth-endpoint",
+      url: "/api/auth-endpoint",
       headers: {
         Authorization: `Bearer ${token}`,
         currency: [newList],
@@ -160,41 +153,6 @@ export default function CurrencyChoose() {
 
     saveToProfile([selected[0], selected[1]]);
   }
-  // const addCurrency = () => {
-  //   setLoading(true);
-  //   const link = `https://api.exchangerate.host/fluctuation?start_date=${yesterDate}&end_date=${dateBeforeYesterdate}&base=${selected[0]}&symbols=${selected[1]}`;
-  //   console.log(link);
-  //   if (selected.length === 0) {
-  //     setNoSelected(true);
-  //     return;
-  //   }
-  //   const configuration = {
-  //     method: "get",
-  //     url: link,
-  //   };
-
-  //   axios(configuration)
-  //     .then((result) => {
-  //       for (const [key, value] of Object.entries(result.data.rates)) {
-  //         const newRate = value.change_pct;
-
-  //         const newRateList = [...rate, newRate];
-  //         setRate(newRateList);
-  //         const newCodes = [...swipePages, [selected[0], selected[1]]];
-  //         setSwipePages(newCodes);
-  //         setLoading(false);
-  //       }
-  //     })
-  //     .catch((error) => {
-  //       error = new Error();
-  //       console.log(error);
-  //     });
-
-  //   setSelected([]);
-  //   handleClose();
-
-  //   saveToProfile([selected[0], selected[1]]);
-  // };
 
   const deleteCurrency = (e) => {
     setRender(false);
@@ -215,7 +173,7 @@ export default function CurrencyChoose() {
 
     const configuration = {
       method: "get",
-      url: "http://localhost:8000/delete",
+      url: "/api/delete",
       headers: {
         Authorization: `Bearer ${token}`,
         currency: newList,

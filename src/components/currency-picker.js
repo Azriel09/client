@@ -461,7 +461,17 @@ export default function CurrencyChoose() {
         {showChart ? (
           <DashboardGraph pass={toPass} />
         ) : (
-          <div style={{ width: "100%", height: "700px" }}></div>
+          <div
+            style={{
+              width: "100%",
+              height: "700px",
+              backgroundColor: "#121268",
+            }}
+          >
+            <h1 style={{ color: "#ff0080" }}>
+              Add a currency and click on it to show the graph!
+            </h1>
+          </div>
         )}
       </Box>
 

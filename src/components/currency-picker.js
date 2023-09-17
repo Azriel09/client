@@ -458,7 +458,11 @@ export default function CurrencyChoose() {
             </Box>
           </Box>
         </Box>
-        {showChart ? <DashboardGraph pass={toPass} /> : null}
+        {showChart ? (
+          <DashboardGraph pass={toPass} />
+        ) : (
+          <div style={{ width: "100%", height: "700px" }}></div>
+        )}
       </Box>
 
       {/* ADD CURRENCY POP UP */}

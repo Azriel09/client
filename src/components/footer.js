@@ -43,7 +43,7 @@ export default function Footer() {
       sx={{
         display: "flex",
         flexDirection: "column",
-        width: "99%",
+        width: "100%",
         height: "300px",
         backgroundColor: "white",
       }}

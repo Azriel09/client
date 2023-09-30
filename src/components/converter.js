@@ -31,10 +31,12 @@ export default function Converter() {
   const [error, setError] = useState(false);
 
   useEffect(() => {
-    fetch("https://api.exchangerate.host/symbols")
+    fetch(
+      "https://gist.githubusercontent.com/stevekinney/8334552/raw/28d6e58f99ba242b7f798a27877e2afce75a5dca/currency-symbols.json"
+    )
       .then((res) => res.json(res))
       .then((data) => {
-        setCode(data.symbols);
+        setCode(data);
       })
       .catch((err) => {
         console.log(err.message);
@@ -49,7 +51,6 @@ export default function Converter() {
       return;
     }
 
-  
     const configuration = {
       method: "get",
       url: `https://api.exchangerate.host/${datepick}?base=${selected}&symbols=${selected2}&amount=${amount}`,
@@ -246,10 +247,10 @@ export default function Converter() {
                 onChange={(e) => setSelected2(e.target.value)}
                 sx={{ width: "100%" }}
               >
-                {Object.entries(code).map(([key, value]) => {
+                {code.map((key) => {
                   return (
-                    <MenuItem value={key} key={key}>
-                      {key} - {value.description}
+                    <MenuItem value={key.abbreviation} key={key.abbreviation}>
+                      {key.abbreviation} - {key.currency}
                     </MenuItem>
                   );
                 })}

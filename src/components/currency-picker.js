@@ -81,7 +81,7 @@ export default function CurrencyChoose() {
     const second = s1[1];
 
     const link = `https://api.exchangerate.host/fluctuation?start_date=${yesterDate}&end_date=${dateBeforeYesterdate}&base=${first}&symbols=${second}`;
-
+    
     const configuration = {
       method: "get",
       url: link,

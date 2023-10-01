@@ -21,7 +21,7 @@ export default function Converter() {
   const currentYear = moment().add(1, "second").format("YYYY-MM-DD");
   const theme = useTheme();
   const isMatch = useMediaQuery(theme.breakpoints.down("550"));
-  const [code, setCode] = useState("");
+  const [code, setCode] = useState();
   const [selected, setSelected] = useState("");
   const [selected2, setSelected2] = useState("");
   const [amount, setAmount] = useState("1");
@@ -186,10 +186,10 @@ export default function Converter() {
                 defaultValue=""
                 onChange={(e) => setSelected(e.target.value)}
               >
-                {code.map((key) => {
+                {code.map((currency) => {
                   return (
-                    <MenuItem value={key.abbreviation} key={key.abbreviation}>
-                      {key.abbreviation} - {key.currency}
+                    <MenuItem value={currency.abbreviation}>
+                      {currency.abbreviation} - {currency.currency}
                     </MenuItem>
                   );
                 })}
@@ -247,10 +247,10 @@ export default function Converter() {
                 onChange={(e) => setSelected2(e.target.value)}
                 sx={{ width: "100%" }}
               >
-                {code.map((key) => {
+                {code.map((currency) => {
                   return (
-                    <MenuItem value={key.abbreviation} key={key.abbreviation}>
-                      {key.abbreviation} - {key.currency}
+                    <MenuItem value={currency.abbreviation}>
+                      {currency.abbreviation} - {currency.currency}
                     </MenuItem>
                   );
                 })}

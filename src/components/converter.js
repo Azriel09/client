@@ -186,10 +186,10 @@ export default function Converter() {
                 defaultValue=""
                 onChange={(e) => setSelected(e.target.value)}
               >
-                {Object.entries(code).map(([key, value]) => {
+                {code.map((key) => {
                   return (
-                    <MenuItem value={key} key={key}>
-                      {key} - {value.description}
+                    <MenuItem value={key.abbreviation} key={key.abbreviation}>
+                      {key.abbreviation} - {key.currency}
                     </MenuItem>
                   );
                 })}
